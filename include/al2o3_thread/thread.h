@@ -13,7 +13,7 @@ typedef struct { char dummy[8]; } Thread_ConditionalVariable;
 #error What bit size if this CPU?!
 #endif
 
-typedef unsigned int Thread_ID;
+typedef unsigned int Thread_ThreadID;
 typedef void* Thread_Thread;
 
 #else
