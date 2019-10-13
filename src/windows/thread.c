@@ -1,6 +1,6 @@
 #include "al2o3_platform/platform.h"
 #include "al2o3_platform/windows.h"
-#include "al2o3_os/thread.h"
+#include "al2o3_thread/thread.h"
 #include <stdlib.h>
 #include "al2o3_memory/memory.h"
 
