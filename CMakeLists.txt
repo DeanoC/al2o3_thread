@@ -15,26 +15,30 @@ if(NOT hasParent)
 endif ()
 
 SET_MIN_VERSIONS()
-set(LibName test)
+set(LibName al2o3_thread)
 project(${LibName})
 
-set(Interface
-		)
+file(GLOB_RECURSE Headers CONFIGURE_DEPENDS include/*.h include/*.hpp)
+file(GLOB Src CONFIGURE_DEPENDS src/*.c src/*.cpp)
+if(WIN32)
+	file(GLOB_RECURSE WindowsSrc CONFIGURE_DEPENDS src/windows/*.c src/windows/*.cpp)
+endif()
+if(APPLE OR UNIX)
+	file(GLOB_RECURSE PosixSrc CONFIGURE_DEPENDS src/posix/*.c src/posix/*.cpp)
+endif()
 
-set(Src
-		)
+list(APPEND Src ${Headers} ${WindowsSrc} ${PosixSrc} )
 
 set(Deps
-    al2o3_platform
+		al2o3_platform
+		al2o3_memory
 		)
-ADD_LIB(${LibName} "${Interface}" "${Src}" "${Deps}")
 
-set( Tests
-		runner.cpp
-		)
+ADD_LIB2(${LibName} "${Src}" "${Deps}")
+
+file( GLOB_RECURSE Tests CONFIGURE_DEPENDS tests/*.cpp )
+
 set( TestDeps
 		al2o3_catch2
-
 		utils_simple_logmanager)
-ADD_LIB_TESTS(${LibName} "${Interface}" "${Tests}" "${TestDeps}")
-
+ADD_LIB2_TESTS(${LibName} "${Tests}" "${TestDeps}")
