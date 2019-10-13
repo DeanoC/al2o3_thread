@@ -35,7 +35,9 @@ set(Deps
 		)
 
 ADD_LIB2(${LibName} "${Src}" "${Deps}")
-
+if (UNIX)
+	target_link_libraries(${LibName} PRIVATE "pthread")
+endif ()
 file( GLOB_RECURSE Tests CONFIGURE_DEPENDS tests/*.cpp )
 
 set( TestDeps
