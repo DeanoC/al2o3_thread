@@ -7,6 +7,7 @@
 #include <sys/sysinfo.h>
 #endif
 #include <pthread.h>
+#include "al2o3_thread/atomic.h"
 
 AL2O3_EXTERN_C bool Thread_MutexCreate(Thread_Mutex *mutex) {
   ASSERT(mutex);
