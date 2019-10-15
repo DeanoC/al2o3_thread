@@ -12,19 +12,41 @@
 ------------------------------------------------------------------------*/
 #include "al2o3_platform/platform.h"
 
+#include <intrin.h>
+#pragma intrinsic(_ReadWriteBarrier)
+#pragma intrinsic(_InterlockedCompareExchange8)
+#pragma intrinsic(_InterlockedCompareExchange16)
+#pragma intrinsic(_InterlockedCompareExchange)
+#pragma intrinsic(_InterlockedCompareExchange64)
+#pragma intrinsic(_InterlockedCompareExchangePointer)
+#pragma intrinsic(_InterlockedExchange8)
+#pragma intrinsic(_InterlockedExchange16)
+#pragma intrinsic(_InterlockedExchange)
+#pragma intrinsic(_InterlockedExchange64)
+
+#pragma intrinsic(_InterlockedExchangeAdd8)
+#pragma intrinsic(_InterlockedExchangeAdd16)
+#pragma intrinsic(_InterlockedExchangeAdd)
+#pragma intrinsic(_InterlockedExchangeAdd64)
+
+#pragma intrinsic(_InterlockedAnd8)
+#pragma intrinsic(_InterlockedAnd16)
+#pragma intrinsic(_InterlockedAnd)
+#pragma intrinsic(_InterlockedAnd64)
+#pragma intrinsic(_InterlockedOr8)
+#pragma intrinsic(_InterlockedOr16)
+#pragma intrinsic(_InterlockedOr)
+#pragma intrinsic(_InterlockedOr64)
+
 //-------------------------------------
 //  Atomic types
 //-------------------------------------
 // In MSVC, correct alignment of each type is already ensured.
-// MSVC doesn't seem subject to out-of-thin-air stores like GCC, so volatile is
-// omitted.
-// (MS volatile implies acquire & release semantics, which may be expensive on
-// ARM or Xbox 360.)
-typedef struct { uint8_t nonatomic; } Thread_Atomic8_t;
-typedef __declspec(align(2)) struct { uint16_t nonatomic; } Thread_Atomic16_t;
-typedef __declspec(align(4)) struct { uint32_t nonatomic; } Thread_Atomic32_t;
-typedef __declspec(align(8)) struct { uint64_t nonatomic; } Thread_Atomic64_t;
-typedef __declspec(align(8)) struct { void* nonatomic; } Thread_AtomicPtr_t;
+typedef struct { uint8_t volatile nonatomic; } Thread_Atomic8_t;
+typedef  struct { uint16_t volatile nonatomic; } __declspec(align(2)) Thread_Atomic16_t;
+typedef struct { uint32_t volatile nonatomic; } __declspec(align(4)) Thread_Atomic32_t;
+typedef struct { uint64_t volatile nonatomic; } __declspec(align(8)) Thread_Atomic64_t;
+typedef struct { void* volatile nonatomic; } __declspec(align(8)) Thread_AtomicPtr_t;
 
 //-------------------------------------
 //  Fences
@@ -53,7 +75,7 @@ AL2O3_FORCE_INLINE void Thread_AtomicStore8Relaxed(Thread_Atomic8_t* object, uin
 }
 
 AL2O3_FORCE_INLINE uint8_t Thread_AtomicCompareExchange8Relaxed(Thread_Atomic8_t* object, uint8_t expected, uint8_t desired) {
-return _InterlockedCompareExchange8((char*) object, desired, expected);
+	return _InterlockedCompareExchange8((char*) object, desired, expected);
 }
 
 AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak8Relaxed(Thread_Atomic8_t* object, uint8_t* expected, uint8_t desired) {
@@ -180,12 +202,12 @@ AL2O3_FORCE_INLINE void Thread_AtomicStore64Relaxed(Thread_Atomic64_t* object, u
 
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicCompareExchange64Relaxed(Thread_Atomic64_t* object, uint64_t expected, uint64_t desired) {
 	// Or make 2 versions of function? (Only if there's an advantage for GCC.)
-	return _InterlockedCompareExchange64(object, desired, expected);
+	return _InterlockedCompareExchange64((volatile __int64 *)object, desired, expected);
 }
 
 AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak64Relaxed(Thread_Atomic64_t* object, uint64_t* expected, uint64_t desired) {
 	uint64_t e = *expected;
-	uint64_t previous = _InterlockedCompareExchange64(object, desired, e);
+	uint64_t previous = _InterlockedCompareExchange64((volatile __int64 *)object, desired, e);
 	intptr_t matched = (previous == e);
 	if (!matched)
 		*expected = previous;
@@ -193,17 +215,17 @@ AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak64Relaxed(Thread_Ato
 }
 
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicExchange64Relaxed(Thread_Atomic64_t* object, uint64_t desired) {
-	return _InterlockedExchange64(object, desired);
+	return _InterlockedExchange64((volatile __int64 *)object, desired);
 }
 
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchAdd64Relaxed(Thread_Atomic64_t* object, int64_t operand) {
-	return _InterlockedExchangeAdd64(object, operand);
+	return _InterlockedExchangeAdd64((volatile __int64 *)object, operand);
 }
 
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchAnd64Relaxed(Thread_Atomic64_t* object, uint64_t operand) {
-	return _InterlockedAnd64(object, operand);
+	return _InterlockedAnd64((volatile __int64 *)object, operand);
 }
 
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchOr64Relaxed(Thread_Atomic64_t* object, uint64_t operand) {
-	return _InterlockedOr64(object, operand);
+	return _InterlockedOr64((volatile __int64 *)object, operand);
 }

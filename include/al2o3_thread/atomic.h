@@ -16,15 +16,12 @@
 #include <stddef.h>
 
 #if AL2O3_COMPILER == AL2O3_COMPILER_MSVC
-#define TURF_C_IMPL_ATOMIC_PATH "al2o3_thread/impl/atomic_msvc.h"
+#include "al2o3_thread/impl/atomic_msvc.h"
 #elif AL2O3_CPU_FAMILY == AL2O3_CPU_X64
-#define TURF_C_IMPL_ATOMIC_PATH "al2o3_thread/impl/atomic_gcc_x64.h"
+#include "al2o3_thread/impl/atomic_gcc_x64.h"
 #else
-#define TURF_C_IMPL_ATOMIC_PATH "*** Don't have a implementation for this CPU family ***"
+#error "*** Don't have a implementation for this CPU family ***"
 #endif
-
-#include TURF_C_IMPL_ATOMIC_PATH
-#undef TURF_C_IMPL_ATOMIC_PATH
 
 typedef enum {
 	Thread_MEMORY_ORDER_RELAXED,
