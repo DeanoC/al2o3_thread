@@ -9,7 +9,7 @@ struct Mutex {
   ~Mutex() { Thread_MutexDestroy(&handle); };
 
   // take ownership of a C level mutex
-  explicit Mutex(Thread_Mutex_t mutie) : handle(mutie) {};
+  explicit Mutex(Thread_Mutex mutie) : handle(mutie) {};
 
   void Acquire() { Thread_MutexAcquire(&handle); };
   void Release() { Thread_MutexRelease(&handle); };
@@ -31,7 +31,7 @@ struct ConditionalVariable {
 
 struct MutexLock {
   MutexLock(Mutex& mutex) : mMutex(&mutex.handle) { Thread_MutexAcquire(mMutex); };
-  MutexLock(Thread_Mutex_t *mutex) : mMutex(mutex) { Thread_MutexAcquire(mMutex); };
+  MutexLock(Thread_Mutex *mutex) : mMutex(mutex) { Thread_MutexAcquire(mMutex); };
   ~MutexLock() { Thread_MutexRelease(mMutex); };
 
   /// Prevent copy construction.
@@ -43,7 +43,7 @@ struct MutexLock {
 };
 
 struct Thread {
-  Thread(Thread_JobFunction_t function, void *data) { Thread_ThreadCreate(&handle, function, data); }
+  Thread(Thread_JobFunction function, void *data) { Thread_ThreadCreate(&handle, function, data); }
   ~Thread() { Thread_ThreadDestroy(&handle); }
 
   void Join() { Thread_ThreadJoin(&handle); }
