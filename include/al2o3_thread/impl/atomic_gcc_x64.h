@@ -15,10 +15,10 @@
 //  Atomic types
 //-------------------------------------
 typedef struct { volatile uint8_t nonatomic; } Thread_Atomic8_t;
-typedef struct { volatile uint16_t nonatomic; } __attribute__((aligned(2))) Thread_Atomic16_t;
-typedef struct { volatile uint32_t nonatomic; } __attribute__((aligned(4))) Thread_Atomic32_t;
-typedef struct { volatile uint64_t nonatomic; } __attribute__((aligned(8))) Thread_Atomic64_t;
-typedef struct { void* volatile nonatomic; } __attribute__((aligned(8))) Thread_AtomicPtr_t;
+typedef struct { volatile uint16_t nonatomic; } Thread_Atomic16_t __attribute__((aligned(2)));
+typedef struct { volatile uint32_t nonatomic; } Thread_Atomic32_t __attribute__((aligned(4)));
+typedef struct { volatile uint64_t nonatomic; } Thread_Atomic64_t __attribute__((aligned(8)));
+typedef struct { void* volatile nonatomic; } Thread_AtomicPtr_t __attribute__((aligned(8)));
 
 //-------------------------------------
 //  Fences
