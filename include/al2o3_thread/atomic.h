@@ -17,10 +17,8 @@
 
 #if AL2O3_COMPILER == AL2O3_COMPILER_MSVC
 #include "al2o3_thread/impl/atomic_msvc.h"
-#elif AL2O3_COMPILER == AL2O3_COMPILER_GCC || AL2O3_COMPILER == AL2O3_COMPILER_CLANG
-#include "al2o3_thread/impl/atomic_gcc_x64.h"
 #else
-#error "*** Don't have a implementation for this CPU family ***"
+#include "al2o3_thread/impl/atomic_gcc_x64.h"
 #endif
 
 typedef enum {
