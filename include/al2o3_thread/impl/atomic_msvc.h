@@ -229,3 +229,10 @@ AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchAnd64Relaxed(Thread_Atomic64_t* ob
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchOr64Relaxed(Thread_Atomic64_t* object, uint64_t operand) {
 	return _InterlockedOr64((volatile __int64 *)object, operand);
 }
+
+/*
+ __int64 exchhi = __int64(with >> 64);
+__int64 exchlo = (__int64)(with);
+
+return _InterlockedCompareExchange128(a, exchhi, exchlo, &cmp) != 0;
+ */

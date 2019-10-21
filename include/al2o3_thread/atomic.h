@@ -22,7 +22,6 @@
 #endif
 
 typedef enum {
-	Thread_MEMORY_ORDER_RELAXED,
 	Thread_MEMORY_ORDER_ACQUIRE,
 	Thread_MEMORY_ORDER_RELEASE,
 	Thread_MEMORY_ORDER_ACQ_REL
@@ -51,25 +50,6 @@ AL2O3_FORCE_INLINE uint8_t Thread_AtomicCompareExchange8(Thread_Atomic8_t *objec
 	uint8_t result = Thread_AtomicCompareExchange8Relaxed(object, expected, desired);
 	if (memoryOrder == Thread_MEMORY_ORDER_ACQUIRE || memoryOrder == Thread_MEMORY_ORDER_ACQ_REL)
 			Thread_AtomicThreadFenceAcquire();
-	return result;
-}
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak8(Thread_Atomic8_t *object,
-																											uint8_t *expected,
-																											uint8_t desired,
-																											int success,
-																											int failure) {
-	if ((success == Thread_MEMORY_ORDER_RELEASE || success == Thread_MEMORY_ORDER_ACQ_REL) ||
-			(failure == Thread_MEMORY_ORDER_RELEASE || failure == Thread_MEMORY_ORDER_ACQ_REL)) {
-		Thread_AtomicThreadFenceRelease();
-	}
-	intptr_t result = Thread_AtomicCompareExchangeWeak8Relaxed(object, expected, desired);
-	if (result) {
-		if (success == Thread_MEMORY_ORDER_ACQUIRE || success == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	} else {
-		if (failure == Thread_MEMORY_ORDER_ACQUIRE || failure == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	}
 	return result;
 }
 
@@ -131,24 +111,6 @@ AL2O3_FORCE_INLINE uint16_t Thread_AtomicCompareExchange16(Thread_Atomic16_t *ob
 			Thread_AtomicThreadFenceAcquire();
 	return result;
 }
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak16(Thread_Atomic16_t *object,
-																											 uint16_t *expected,
-																											 uint16_t desired,
-																											 int success,
-																											 int failure) {
-	if ((success == Thread_MEMORY_ORDER_RELEASE || success == Thread_MEMORY_ORDER_ACQ_REL) ||
-			(failure == Thread_MEMORY_ORDER_RELEASE || failure == Thread_MEMORY_ORDER_ACQ_REL))
-			Thread_AtomicThreadFenceRelease();
-	intptr_t result = Thread_AtomicCompareExchangeWeak16Relaxed(object, expected, desired);
-	if (result) {
-		if (success == Thread_MEMORY_ORDER_ACQUIRE || success == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	} else {
-		if (failure == Thread_MEMORY_ORDER_ACQUIRE || failure == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	}
-	return result;
-}
 AL2O3_FORCE_INLINE uint16_t Thread_AtomicExchange16(Thread_Atomic16_t *object, uint16_t desired, Thread_memoryOrder_t memoryOrder) {
 	if (memoryOrder == Thread_MEMORY_ORDER_RELEASE || memoryOrder == Thread_MEMORY_ORDER_ACQ_REL)
 			Thread_AtomicThreadFenceRelease();
@@ -207,24 +169,7 @@ AL2O3_FORCE_INLINE uint32_t Thread_AtomicCompareExchange32(Thread_Atomic32_t *ob
 			Thread_AtomicThreadFenceAcquire();
 	return result;
 }
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak32(Thread_Atomic32_t *object,
-																											 uint32_t *expected,
-																											 uint32_t desired,
-																											 int success,
-																											 int failure) {
-	if ((success == Thread_MEMORY_ORDER_RELEASE || success == Thread_MEMORY_ORDER_ACQ_REL) ||
-			(failure == Thread_MEMORY_ORDER_RELEASE || failure == Thread_MEMORY_ORDER_ACQ_REL))
-			Thread_AtomicThreadFenceRelease();
-	intptr_t result = Thread_AtomicCompareExchangeWeak32Relaxed(object, expected, desired);
-	if (result) {
-		if (success == Thread_MEMORY_ORDER_ACQUIRE || success == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	} else {
-		if (failure == Thread_MEMORY_ORDER_ACQUIRE || failure == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	}
-	return result;
-}
+
 AL2O3_FORCE_INLINE uint32_t Thread_AtomicExchange32(Thread_Atomic32_t *object, uint32_t desired, Thread_memoryOrder_t memoryOrder) {
 	if (memoryOrder == Thread_MEMORY_ORDER_RELEASE || memoryOrder == Thread_MEMORY_ORDER_ACQ_REL)
 			Thread_AtomicThreadFenceRelease();
@@ -283,24 +228,6 @@ AL2O3_FORCE_INLINE uint64_t Thread_AtomicCompareExchange64(Thread_Atomic64_t *ob
 			Thread_AtomicThreadFenceAcquire();
 	return result;
 }
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeak64(Thread_Atomic64_t *object,
-																											 uint64_t *expected,
-																											 uint64_t desired,
-																											 int success,
-																											 int failure) {
-	if ((success == Thread_MEMORY_ORDER_RELEASE || success == Thread_MEMORY_ORDER_ACQ_REL) ||
-			(failure == Thread_MEMORY_ORDER_RELEASE || failure == Thread_MEMORY_ORDER_ACQ_REL))
-			Thread_AtomicThreadFenceRelease();
-	intptr_t result = Thread_AtomicCompareExchangeWeak64Relaxed(object, expected, desired);
-	if (result) {
-		if (success == Thread_MEMORY_ORDER_ACQUIRE || success == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	} else {
-		if (failure == Thread_MEMORY_ORDER_ACQUIRE || failure == Thread_MEMORY_ORDER_ACQ_REL)
-				Thread_AtomicThreadFenceAcquire();
-	}
-	return result;
-}
 AL2O3_FORCE_INLINE uint64_t Thread_AtomicExchange64(Thread_Atomic64_t *object, uint64_t desired, Thread_memoryOrder_t memoryOrder) {
 	if (memoryOrder == Thread_MEMORY_ORDER_RELEASE || memoryOrder == Thread_MEMORY_ORDER_ACQ_REL)
 			Thread_AtomicThreadFenceRelease();
@@ -343,11 +270,6 @@ AL2O3_FORCE_INLINE void Thread_AtomicStorePtrRelaxed(Thread_AtomicPtr_t *object,
 AL2O3_FORCE_INLINE void *Thread_AtomicCompareExchangePtrRelaxed(Thread_AtomicPtr_t *object, void *expected, void *desired) {
 	return (void *) Thread_AtomicCompareExchange64Relaxed((Thread_Atomic64_t *) object, (size_t) expected, (size_t) desired);
 }
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeakPtrRelaxed(Thread_AtomicPtr_t *object,
-																															 void **expected,
-																															 void *desired) {
-	return Thread_AtomicCompareExchangeWeak64Relaxed((Thread_Atomic64_t *) object, (uint64_t *) expected, (size_t) desired);
-}
 AL2O3_FORCE_INLINE void *Thread_AtomicExchangePtrRelaxed(Thread_AtomicPtr_t *object, void *desired) {
 	return (void *) Thread_AtomicExchange64Relaxed((Thread_Atomic64_t *) object, (size_t) desired);
 }
@@ -371,17 +293,6 @@ AL2O3_FORCE_INLINE void *Thread_AtomicCompareExchangePtr(Thread_AtomicPtr_t *obj
 																												 void *desired,
 																												 Thread_memoryOrder_t memoryOrder) {
 	return (void *) Thread_AtomicCompareExchange64((Thread_Atomic64_t *) object, (size_t) expected, (size_t) desired, memoryOrder);
-}
-AL2O3_FORCE_INLINE intptr_t Thread_AtomicCompareExchangeWeakPtr(Thread_AtomicPtr_t *object,
-																												void **expected,
-																												void *desired,
-																												int success,
-																												int failure) {
-	return Thread_AtomicCompareExchangeWeak64((Thread_Atomic64_t *) object,
-																		(uint64_t *) expected,
-																		(size_t) desired,
-																		success,
-																		failure);
 }
 AL2O3_FORCE_INLINE void *Thread_AtomicExchangePtr(Thread_AtomicPtr_t *object, void *desired, Thread_memoryOrder_t memoryOrder) {
 	return (void *) Thread_AtomicExchange64((Thread_Atomic64_t *) object, (size_t) desired, memoryOrder);
