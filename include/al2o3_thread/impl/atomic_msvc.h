@@ -237,23 +237,24 @@ AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchOr64Relaxed(Thread_Atomic64_t* obj
 // 128 bit atomics
 
 AL2O3_FORCE_INLINE platform_uint128_t Thread_AtomicCompareExchange128Relaxed(Thread_Atomic128_t* object, platform_uint128_t expected, platform_uint128_t desired) {
-	return _InterlockedCompareExchange128(object, platform_GetLower128(expected), platform_GetUpper128(expected), &desired);
+	_InterlockedCompareExchange128(object->nonatomic.m128i_i64, desired.m128i_i64[1], desired.m128i_i64[0], expected.m128i_i64);
+	return expected;
 }
 
 AL2O3_FORCE_INLINE void Thread_AtomicStore128Relaxed(Thread_Atomic128_t* object, platform_uint128_t desired) {
 	// x64 with cx16 can handle 128 bit atomics
-Redo:
-	platform_uint128_t old = object->nonatomic;
-	while(!platform_Compare128(Thread_AtomicCompareExchange128Relaxed(object, old, desired), old) {
+Redo:;
+	platform_uint128_t s = *((platform_uint128_t*)&object->nonatomic);
+	if(!_InterlockedCompareExchange128(object->nonatomic.m128i_i64, desired.m128i_i64[1], desired.m128i_i64[0], s.m128i_i64)) {
 		goto Redo;
 	}
 }
 
 AL2O3_FORCE_INLINE platform_uint128_t Thread_AtomicLoad128Relaxed(Thread_Atomic128_t* object) {
-Redo:
-	platform_uint128_t old = object->nonatomic;
-	while(!platform_Compare128(Thread_AtomicCompareExchange128Relaxed(object, old, old), old) {
+Redo:;
+	platform_uint128_t s = *((platform_uint128_t*)&object->nonatomic);
+	if(!_InterlockedCompareExchange128(object->nonatomic.m128i_i64, s.m128i_i64[1], s.m128i_i64[0], s.m128i_i64)) {
 		goto Redo;
 	}
-	return old;
+	return s;
 }
