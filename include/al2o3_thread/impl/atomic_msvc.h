@@ -233,9 +233,27 @@ AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchOr64Relaxed(Thread_Atomic64_t* obj
 	return _InterlockedOr64((volatile __int64 *)object, operand);
 }
 
-/*
- __int64 exchhi = __int64(with >> 64);
-__int64 exchlo = (__int64)(with);
 
-return _InterlockedCompareExchange128(a, exchhi, exchlo, &cmp) != 0;
- */
+// 128 bit atomics
+
+AL2O3_FORCE_INLINE platform_uint128_t Thread_AtomicCompareExchange128Relaxed(Thread_Atomic128_t* object, platform_uint128_t expected, platform_uint128_t desired) {
+	return _InterlockedCompareExchange128(object, platform_GetLower128(expected), platform_GetUpper128(expected), &desired);
+}
+
+AL2O3_FORCE_INLINE void Thread_AtomicStore128Relaxed(Thread_Atomic128_t* object, platform_uint128_t desired) {
+	// x64 with cx16 can handle 128 bit atomics
+Redo:
+	platform_uint128_t old = object->nonatomic;
+	while(!platform_Compare128(Thread_AtomicCompareExchange128Relaxed(object, old, desired), old) {
+		goto Redo;
+	}
+}
+
+AL2O3_FORCE_INLINE platform_uint128_t Thread_AtomicLoad128Relaxed(Thread_Atomic128_t* object) {
+Redo:
+	platform_uint128_t old = object->nonatomic;
+	while(!platform_Compare128(Thread_AtomicCompareExchange128Relaxed(object, old, old), old) {
+		goto Redo;
+	}
+	return old;
+}
