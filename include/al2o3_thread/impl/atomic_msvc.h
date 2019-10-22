@@ -18,7 +18,9 @@
 #pragma intrinsic(_InterlockedCompareExchange16)
 #pragma intrinsic(_InterlockedCompareExchange)
 #pragma intrinsic(_InterlockedCompareExchange64)
+#pragma intrinsic(_InterlockedCompareExchange128)
 #pragma intrinsic(_InterlockedCompareExchangePointer)
+
 #pragma intrinsic(_InterlockedExchange8)
 #pragma intrinsic(_InterlockedExchange16)
 #pragma intrinsic(_InterlockedExchange)
@@ -46,6 +48,7 @@ typedef struct { uint8_t volatile nonatomic; } Thread_Atomic8_t;
 typedef struct { uint16_t volatile nonatomic; } __declspec(align(2)) Thread_Atomic16_t;
 typedef struct { uint32_t volatile nonatomic; } __declspec(align(4)) Thread_Atomic32_t;
 typedef struct { uint64_t volatile nonatomic; } __declspec(align(8)) Thread_Atomic64_t;
+typedef struct { uint128_t volatile nonatomic; } __declspec(align(16)) Thread_Atomic128_t;
 typedef struct { void* volatile nonatomic; } __declspec(align(8)) Thread_AtomicPtr_t;
 
 //-------------------------------------

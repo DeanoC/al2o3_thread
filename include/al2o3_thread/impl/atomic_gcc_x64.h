@@ -18,11 +18,9 @@ typedef struct { volatile uint8_t nonatomic; } Thread_Atomic8_t;
 typedef struct { volatile uint16_t nonatomic; } Thread_Atomic16_t __attribute__((aligned(2)));
 typedef struct { volatile uint32_t nonatomic; } Thread_Atomic32_t __attribute__((aligned(4)));
 typedef struct { volatile uint64_t nonatomic; } Thread_Atomic64_t __attribute__((aligned(8)));
-typedef struct { volatile unsigned __int128 nonatomic; } Thread_Atomic128_t __attribute__((aligned(16)));
+typedef struct { volatile uint128_t nonatomic; } Thread_Atomic128_t __attribute__((aligned(16)));
 
 typedef struct { void* volatile nonatomic; } Thread_AtomicPtr_t __attribute__((aligned(8)));
-
-typedef unsigned __int128 uint128_t;
 
 //-------------------------------------
 //  Fences
@@ -176,17 +174,17 @@ AL2O3_FORCE_INLINE uint64_t Thread_AtomicFetchOr64Relaxed(Thread_Atomic64_t* obj
 
 // 128 bit atomics
 AL2O3_FORCE_INLINE uint128_t Thread_AtomicLoad128Relaxed(Thread_Atomic128_t* object) {
-	return __sync_fetch_and_or(&object->nonatomic, 0);
+	return (uint128_t)__sync_fetch_and_or((__int128*)&object->nonatomic, 0);
 }
 
 AL2O3_FORCE_INLINE void Thread_AtomicStore128Relaxed(Thread_Atomic128_t* object, uint128_t desired) {
 	// x64 with cx16 can handle 128 bit atomics
-	while(!__sync_bool_compare_and_swap(&object->nonatomic, Thread_AtomicLoad128Relaxed(object), desired))
+	while(!__sync_bool_compare_and_swap((__int128*)&object->nonatomic, (__int128)Thread_AtomicLoad128Relaxed(object), (__int128)desired))
 	{
 		// try again
 	}
 }
 
 AL2O3_FORCE_INLINE uint128_t Thread_AtomicCompareExchange128Relaxed(Thread_Atomic128_t* object, uint128_t expected, uint128_t desired) {
-	return __sync_val_compare_and_swap(&object->nonatomic, expected, desired);
+	return (uint128_t)__sync_val_compare_and_swap((__int128*)&object->nonatomic, (__int128)expected, (__int128)desired);
 }
