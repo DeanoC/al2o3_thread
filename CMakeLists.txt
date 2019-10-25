@@ -39,12 +39,12 @@ set(Deps
 ADD_LIB2(${LibName} "${Src}" "${Deps}")
 if (UNIX)
 	target_link_libraries(${LibName} PRIVATE "pthread")
-	if(CMAKE_COMPILER_IS_GNUCXX AND
-	(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0))
+	if(NOT APPLE)
 		target_link_libraries(${LibName} PRIVATE "atomic")
-
 	endif()
+	target_compile_options(${LibName} PUBLIC -mcx16)
 endif ()
+
 file( GLOB_RECURSE Tests CONFIGURE_DEPENDS tests/*.cpp )
 
 set( TestDeps
